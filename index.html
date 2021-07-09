@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Document</title>
+		<style>
+			* {
+				font-family: Consolas, 'Microsoft JhengHei';
+			}
+			body {
+				margin: 0;
+				padding: 0;
+			}
+
+			tbody {
+				display: block;
+				height: calc(100vh - 26px);
+				overflow-y: auto;
+				overflow-x: hidden;
+			}
+			thead,
+			tbody tr {
+				display: table;
+				width: 100%;
+				table-layout: fixed;
+			}
+			thead {
+				width: calc(100% - 1em);
+				background-color: aquamarine;
+			}
+			table {
+				width: 100%;
+				margin: 0 0 0 auto;
+				border-collapse: collapse;
+			}
+			th,
+			td {
+				text-align: center;
+				word-wrap: break-word;
+				word-break: break-all;
+			}
+
+			th:nth-last-of-type(1),
+			tr > td:nth-last-of-type(1) {
+				width: 40%;
+			}
+
+			body > div {
+				float: left;
+				height: 100vh;
+			}
+			body > div:nth-of-type(1) {
+				width: 300px;
+			}
+			body > div:nth-of-type(2) {
+				width: calc(100% - 300px);
+			}
+			body > div:nth-of-type(1) > div:nth-of-type(1) {
+				width: 100%;
+				height: 45%;
+			}
+			body > div:nth-of-type(1) > div:nth-of-type(2) {
+				width: 100%;
+				height: 55%;
+			}
+
+			#filter > div:nth-of-type(1) {
+				height: fit-content;
+				width: 100%;
+				border-bottom: 1px solid black;
+				background-color: rgb(255, 231, 201);
+				padding: 16px 0;
+			}
+			#filter > div:nth-of-type(2) {
+				float: left;
+				height: calc(100% - 60px);
+				border-bottom: 1px solid black;
+				width: 100%;
+			}
+			#filter > div:nth-of-type(2) > div {
+				float: left;
+				width: calc(50% - 1px);
+				height: 100%;
+				overflow-y: auto;
+			}
+
+			#filter > div:nth-of-type(2) > div:first-of-type {
+				border-right: 1px solid black;
+			}
+
+			#filter span {
+				display: block;
+				text-align: center;
+				padding: 4px 0;
+				cursor: default;
+			}
+
+			#filter > div:nth-of-type(2) > div > span:not(:last-of-type) {
+				border-bottom: 1px solid black;
+			}
+
+			#filter > div:nth-of-type(2) > div > span:hover {
+				background-color: aquamarine;
+				cursor: pointer;
+			}
+
+			#sorter > span {
+				display: block;
+				text-align: center;
+				padding: 16px 0;
+			}
+			#sorter > span:nth-of-type(1) {
+				background-color: rgb(255, 231, 201);
+				cursor: default;
+			}
+			#sorter > span:not(:first-of-type) {
+				border-top: 1px dashed black;
+			}
+			#sorter > span:not(:first-of-type):hover {
+				cursor: pointer;
+				background-color: aquamarine;
+			}
+
+			.active {
+				background-color: rgba(255, 127, 238, 0.582);
+			}
+			.active#asc::after {
+				content: '↑';
+			}
+			.active#desc::after {
+				content: '↓';
+			}
+		</style>
+	</head>
+	<body>
+		<div>
+			<div id="filter">
+				<div>
+					<span>Filter</span>
+				</div>
+				<div>
+					<div id="topic"></div>
+					<div id="valence"></div>
+				</div>
+			</div>
+			<div id="sorter"></div>
+		</div>
+		<div id="table"></div>
+
+		<script>
+			//A班
+			//http://140.138.154.197:8787/CP113/A/HW4
+			//B班
+			//http://140.138.154.197:8787/CP113/B/HW4
+
+			// 宣告 目標 URL
+			const requestURL = 'http://140.138.154.197:8787/CP113/B/HW4';
+
+			// 回傳 DATA 欄位
+			const columns = [
+				'topic',
+				'sub_topic',
+				'date',
+				'board',
+				'd_v',
+				'd_a',
+				'valence',
+				'title',
+			];
+
+			// 宣告 data 暫存
+			let ori_data = '';
+
+			// Fetch data
+			async function Get_Data() {
+				const res = await fetch(requestURL);
+
+				// parse data to json format
+				const result = await res.json();
+
+				// print original callback
+				console.log(result);
+				return result;
+			}
+
+			// Inintial View
+			async function Create_View() {
+				const raw_data = await Get_Data();
+
+				// store original data
+				ori_data = raw_data['data'];
+				const data = ori_data;
+
+				// Rebuild json process
+				Rebuild_Json(data);
+
+				// Create table view process
+				Table_Dom(data);
+
+				// Create sorter view process
+				Sorter_Dom(data);
+
+				// Create filter view process
+				Filter_Dom(data);
+			}
+
+			function Rebuild_Json(data) {
+				let topics = [];
+				let topic_arr = [];
+
+				// 對 Topic 進行唯一篩選
+				for (let i = 0; i < data.length; i++) {
+					if (!topic_arr.includes(data[i]['topic'])) {
+						topic_arr.push(data[i]['topic']);
+					}
+				}
+
+				// loop topic
+				for (let i = 0; i < topic_arr.length; i++) {
+					let sub_topics = [];
+					let sub_topic_arr = [];
+
+					// 過濾 topic
+					let filter_topic = data.filter(function (item) {
+						return item.topic == topic_arr[i];
+					});
+
+					// 對 sub_Topic 進行唯一篩選
+					for (let j = 0; j < filter_topic.length; j++) {
+						if (
+							!sub_topic_arr.includes(
+								filter_topic[j]['sub_topic']
+							)
+						) {
+							sub_topic_arr.push(filter_topic[j]['sub_topic']);
+						}
+					}
+
+					// loop sub_topic
+					for (let j = 0; j < sub_topic_arr.length; j++) {
+						// 過濾 sub_topic
+						let filter_sub_topic = data.filter(function (item) {
+							return item.sub_topic == sub_topic_arr[j];
+						});
+
+						sub_topics.push({
+							name: sub_topic_arr[j],
+							length: filter_sub_topic.length,
+						});
+					}
+
+					topics.push({
+						topic: topic_arr[i],
+						length: filter_topic.length,
+						sub_topics: sub_topics,
+					});
+				}
+
+				// 印出結果，並包裝成正規 json
+				console.log({
+					total: data.length,
+					tags: topics,
+				});
+			}
+
+			// Create table，用參數傳入可變成 reuse function
+			function Table_Dom(data) {
+				let table_dom = '<table border="1">';
+				table_dom += '<thead><tr>';
+
+				for (let i = 0; i < columns.length; i++) {
+					table_dom += '<th>' + columns[i] + '</th>';
+				}
+				table_dom += '</tr></thead>';
+
+				table_dom += '<tbody>';
+
+				// 讓 data 在對應的 columns 生成
+				for (let i = 0; i < data.length; i++) {
+					table_dom += '<tr>';
+					for (let j = 0; j < columns.length; j++) {
+						table_dom += '<td>' + data[i][columns[j]] + '</td>';
+					}
+					table_dom += '</tr>';
+				}
+				table_dom += '</tbody>';
+
+				document.getElementById('table').innerHTML = table_dom;
+			}
+
+			// Create sorter，用參數傳入可變成 reuse function
+			function Sorter_Dom(data) {
+				let sorter_dom = '<span>' + 'Sorters' + '</span>';
+				let sorter_col = ['date', 'd_v', 'd_a', 'valence'];
+				for (let i = 0; i < sorter_col.length; i++) {
+					sorter_dom +=
+						'<span class="sorter">' + sorter_col[i] + '</span>';
+				}
+				document.getElementById('sorter').innerHTML = sorter_dom;
+
+				// 對 sorters 加上事件
+				const sorters = document.getElementsByClassName('sorter');
+				for (let i = 0; i < sorters.length; i++) {
+					sorters[i].addEventListener('click', Sorters_Event);
+				}
+			}
+
+			// Create filter，用參數傳入可變成 reuse function
+			function Filter_Dom(data) {
+				let topic_arr = ['全部'];
+				let valence_arr = ['全部'];
+				let topic_dom = '';
+				let valence_dom = '';
+
+				// create topic/valence filters
+				for (let i = 0; i < data.length; i++) {
+					if (!topic_arr.includes(data[i]['topic'])) {
+						topic_arr.push(data[i]['topic']);
+					}
+					if (!valence_arr.includes(data[i]['valence'])) {
+						valence_arr.push(data[i]['valence']);
+					}
+				}
+
+				for (let i = 0; i < topic_arr.length; i++) {
+					topic_dom +=
+						'<span class="filters">' + topic_arr[i] + '</span>';
+				}
+				for (let i = 0; i < valence_arr.length; i++) {
+					valence_dom +=
+						'<span class="filters">' + valence_arr[i] + '</span>';
+				}
+
+				document.getElementById('topic').innerHTML = topic_dom;
+				document.getElementById('valence').innerHTML = valence_dom;
+
+				// 對 filters 加上事件
+				const filters = document.getElementsByClassName('filters');
+				for (let i = 0; i < filters.length; i++) {
+					filters[i].addEventListener('click', Filters_Event);
+				}
+			}
+
+			function Sorters_Event(ele) {
+				let data = ori_data;
+
+				let col = ele.target.innerHTML;
+
+				// (作業無) 清除 span dom 狀態
+				let spans = document.getElementsByTagName('span');
+				for (let i = 0; i < spans.length; i++) {
+					spans[i].classList.remove('active');
+				}
+
+				// 採取用 id 儲存狀態
+				if (ele.target.id == '') {
+					ele.target.id = 'asc';
+
+					// asc sort by target sorter
+					data = data.sort(function (a, b) {
+						return a[col] > b[col] ? 1 : a[col] < b[col] ? -1 : 0;
+					});
+
+					// (作業無) 加上 span 狀態
+					ele.target.classList.add('active');
+
+					// table view rebuild
+					Table_Dom(data);
+				} else if (ele.target.id == 'asc') {
+					ele.target.id = 'desc';
+
+					// desc sort by target sorter
+					data = data.sort(function (a, b) {
+						return b[col] > a[col] ? 1 : b[col] < a[col] ? -1 : 0;
+					});
+
+					// (作業無) 加上 span 狀態
+					ele.target.classList.add('active');
+					// table view rebuild
+					Table_Dom(data);
+				} else {
+					// (作業無) 清除 span 狀態
+					ele.target.classList.remove('active');
+					ele.target.id = '';
+
+					// table view rebuild
+					Table_Dom(data);
+				}
+			}
+			function Filters_Event(ele) {
+				let data = ori_data;
+				const valence_cols = ['pos', 'neu', 'neg'];
+
+				// (作業無) 清除 span dom 狀態
+				let spans = document.getElementsByTagName('span');
+				for (let i = 0; i < spans.length; i++) {
+					spans[i].classList.remove('active');
+				}
+
+				// filter data by target valence statu
+				if (valence_cols.includes(ele.target.innerHTML)) {
+					ele.target.classList.add('active');
+					data = data.filter(function (item) {
+						return item.valence == ele.target.innerHTML;
+					});
+					// table view rebuild
+					Table_Dom(data);
+				} else if (ele.target.innerHTML == '全部') {
+					// table view rebuild
+					Table_Dom(data);
+				} else {
+					ele.target.classList.add('active');
+					data = data.filter(function (item) {
+						return item.topic == ele.target.innerHTML;
+					});
+					// table view rebuild
+					Table_Dom(data);
+				}
+			}
+
+			// main process start
+			Create_View();
+		</script>
+	</body>
+</html>
