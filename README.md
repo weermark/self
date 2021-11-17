@@ -1,4 +1,4 @@
 # self
 weermark home page
 ## just try
-## upload some class code
+record some class and homework code.
