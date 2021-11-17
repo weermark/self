@@ -1,4 +1,4 @@
 # self
 weermark home page
-## just try
+## class
 record some class and homework code.
