@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+        * {
+            font-family: Consolas, 'Microsoft JhengHei';
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        tbody {
+            display: block;
+            height: calc(100vh - 26px);
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        thead,
+        tbody tr {
+            display: table;
+            width: 100%;
+            table-layout: fixed;
+        }
+
+        thead {
+            width: calc(100% - 1em);
+            background-color: aquamarine;
+        }
+
+        table {
+            width: 100%;
+            margin: 0 0 0 auto;
+            border-collapse: collapse;
+
+        }
+
+        th,
+        td {
+            text-align: center;
+            word-wrap: break-word;
+            word-break: break-all;
+        }
+
+        th:nth-last-of-type(1),
+        tr>td:nth-last-of-type(1) {
+            width: 40%;
+        }
+
+        body>div {
+            float: left;
+            height: 100vh;
+        }
+
+        body>div:nth-of-type(1) {
+            width: 300px;
+        }
+
+        body>div:nth-of-type(2) {
+            width: calc(100% - 300px);
+        }
+
+        body>div:nth-of-type(1)>div:nth-of-type(1) {
+            width: 100%;
+            height: 45%;
+        }
+
+        body>div:nth-of-type(1)>div:nth-of-type(2) {
+            width: 100%;
+            height: 55%;
+        }
+
+        #filter>div:nth-of-type(1) {
+            height: fit-content;
+            width: 100%;
+            border-bottom: 1px solid black;
+            background-color: rgb(255, 231, 201);
+            padding: 16px 0;
+        }
+
+        #filter>div:nth-of-type(2) {
+            float: left;
+            height: calc(100% - 60px);
+            border-bottom: 1px solid black;
+            width: 100%;
+        }
+
+        #filter>div:nth-of-type(2)>div {
+            float: left;
+            width: calc(50% - 1px);
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        #filter>div:nth-of-type(2)>div:first-of-type {
+            border-right: 1px solid black;
+        }
+
+        #filter span {
+            display: block;
+            text-align: center;
+            padding: 4px 0;
+            cursor: default;
+        }
+
+        #filter>div:nth-of-type(2)>div>span:not(:last-of-type) {
+            border-bottom: 1px solid black;
+        }
+
+        #filter>div:nth-of-type(2)>div>span:hover {
+            background-color: aquamarine;
+            cursor: pointer;
+        }
+
+        #sorter>span {
+            display: block;
+            text-align: center;
+            padding: 16px 0;
+        }
+
+        #sorter>span:nth-of-type(1) {
+            background-color: rgb(255, 231, 201);
+            cursor: default;
+        }
+
+        #sorter>span:not(:first-of-type) {
+            border-top: 1px dashed black;
+        }
+
+        #sorter>span:not(:first-of-type):hover {
+            cursor: pointer;
+            background-color: aquamarine;
+        }
+
+        .active {
+            background-color: rgba(255, 127, 238, 0.582);
+        }
+
+        .active#asc::after {
+            content: '↑';
+        }
+
+        .active#desc::after {
+            content: '↓';
+        }
+    </style>
+</head>
+
+<body>
+    <div>
+        <div id="filter">
+            <div>
+                <span>Filter</span>
+            </div>
+            <div>
+                <div id="topic"></div>
+                <div id="valence"></div>
+            </div>
+        </div>
+        <div id="sorter"></div>
+    </div>
+    <div id="table"></div>
+
+    <script>
+        //A班
+        //http://140.138.154.197:8787/CP113/A/HW4
+        //B班
+        //http://140.138.154.197:8787/CP113/B/HW4
+        const requestURL = 'http://140.138.154.197:8787/CP113/B/HW4';
+        const columns = [
+            'topic',
+            'sub_topic',
+            'date',
+            'board',
+            'd_v',
+            'd_a',
+            'valence',
+            'title',
+        ];
+
+        let ori_data = '';
+
+        //--------------------------------
+        // ---------本次作業作答區---------
+        //--------------------------------
+        // const fetch = require("node-fetch");
+        //const HTMLParser = require("node-html-parser");
+
+        fetch(requestURL)
+            .then(response => response.json())
+            .then(json => {
+                parseJSON2Table(json);
+
+            })
+
+        function parseJSON2Table(jsonObj) {
+            let rows = [];
+            ori_data = jsonObj.data
+            for (let i = 0; i < ori_data.length; i++) {
+                topic = ori_data[i]['topic']
+                sub_topic = ori_data[i]['sub_topic']
+                date = ori_data[i]['date']
+                board = ori_data[i]['board']
+                d_v = ori_data[i]["d_v"]
+                d_a = ori_data[i]["d_a"]
+                valence = ori_data[i]["valence"]
+                title = ori_data[i]["title"]
+                let row = [topic, sub_topic, date, board, d_v, d_a, valence, title]
+                rows.push(row);
+            }
+            //console.log(rows)
+            let topic_name = []
+            let name = []
+            var num = 0
+            topic_name.push(rows[0][0])
+            for (let i = 0; i < rows.length; i++) {
+                for (let j = 0; j < topic_name.length; j++) { //topic
+                    if (topic_name[j] == rows[i][0]) { //topic沒重複則加入topic_name
+                        num++;
+                    }
+                }
+                if (num == 0) {
+                    topic_name.push(rows[i][0])
+                }
+                num = 0;
+            }
+            //console.log(topic_name)
+            let len = [];
+            let time = 0;
+            let num2 = 0;
+            let tags = [];
+            let sub_array = []
+            for (let i = 0; i < topic_name.length; i++) {
+                let sub_topic_name = []
+                for (let j = 0; j < rows.length; j++) {
+                    if (topic_name[i] == rows[j][0]) { //檢查內容
+                        if (time == 0) {
+                            sub_topic_name.push(rows[j][1]) //
+                        }
+                        time++;
+                        for (let k = 0; k < sub_topic_name.length; k++) {
+                            if (sub_topic_name[k] == rows[j][1]) { //
+                                num2++;
+                            }
+                        }
+                        if (num2 == 0) {
+                            sub_topic_name.push(rows[j][1]) //
+                        }
+                    }
+                    num2 = 0;
+                }
+                //console.log(sub_topic_name)
+
+                sub_array.push(sub_topic_name)
+                len.push(time)
+                //tags.push(["topic:"+topic_name[i], "length:"+time, "sub_topics:"+sub_topic_name])
+                time = 0;
+            }
+
+            let time2 = []
+            let time2_1 = []
+            for (var i = 0; i < sub_array.length; i++) {
+                for (var j = 0; j < sub_array[i].length; j++) {
+                    time2_1.push(0)
+                }
+                time2.push(time2_1)
+                time2_1 = []
+            }
+
+            for (var i = 0; i < sub_array.length; i++) {
+                for (var j = 0; j < sub_array[i].length; j++) {
+                    for (var k = 0; k < rows.length; k++) {
+                        if (topic_name[i] == rows[k][0]) {
+                            if (sub_array[i][j] == rows[k][1]) { //split(":")
+                                time2[i][j]++
+                            }
+                        }
+                    }
+                    //sub_array[i].push(time2[i][j])
+                }
+                //console.log('5')
+                //tags.push(["topic:"+topic_name[i], "length:"+time, "sub_topics:"+sub_array[i]])
+            }
+            //console.log(tags)
+            let com_sub = []
+            //let s_sub = []
+            for (var i = 0; i < sub_array.length; i++) {
+                com_sub.push([]) //[14]
+                // for (var j = 0; j < sub_array[i].length; j++) {
+                //     com_sub[i].push([])
+                // }
+            }
+
+            for (var i = 0; i < sub_array.length; i++) {
+                for (var j = 0; j < sub_array[i].length; j++) {
+                    let a = sub_array[i][j]
+                    let b = time2[i][j]
+                    com_sub[i].push({
+                        "name": a,
+                        "length": b
+                    })
+                    //console.log(s_sub)
+                }
+                //com_sub[i].push(s_sub)
+                //s_sub = []
+            }
+            //console.log(com_sub[0])
+
+            // for (var i = 0; i < sub_array.length; i++) {
+            //     for (var j = 0; j < sub_array[i].length; j++) {
+            //          let a = sub_array[i][j]
+            //          let b = time2[i][j]
+            //          s_sub.push(a, b)
+            //         //console.log(s_sub)
+            //     }
+            //     com_sub[i].push(s_sub)
+            //     s_sub = []
+            // }
+
+            //console.log(com_sub)
+
+            //console.log(sub_array)
+
+            //console.log(com_sub)
+
+            let all = []
+            let all_news_length = rows.length
+            //1
+            for (var i = 0; i < sub_array.length; i++) {
+                tags.push({
+                    "topic": topic_name[i],
+                    "length": len[i],
+                    "sub_topics": com_sub[i]
+                })
+            }
+
+            all = {
+                "total": all_news_length,
+                "tages": tags
+            }
+
+            console.log(all)
+
+
+            //////////////////////////我是分割線//////////////////////////////////////
+
+            let html = array2dToHtmlTable(rows, columns);
+
+            function array2dToHtmlTable(rows, cols) {
+                var htmlstr = ""
+
+                htmlstr += "<table border=1px>"
+
+                var theads =
+                    '<thead><tr><th onmousedown="mdown(this)">' +
+                    cols.join("</th><th>") +
+                    "</th></tr></thead>";
+
+                htmlstr += theads;
+                // 數據列
+                htmlstr += "<tbody>"
+                rows.forEach(function (rows) {
+                    var trstr = "<tr><td>" + rows.join("</td><td>") + "</td></tr>";
+                    htmlstr += trstr + "\n";
+                });
+
+                htmlstr += "</tbody>\n</table>\n";
+                return htmlstr
+            }
+            document.getElementById("table").innerHTML = html
+
+            //////////////////////////////filter///////////////////////////////////
+
+            function mdown(element) {
+                var button = element.innerHTML
+                var isit = document.getElementsByTagName("td")
+                for (var i = 0; i < isit.length; i++) {
+                    if(isit[i].innerHTML != button){
+                        isit[i].parentElement.style.display = "none"
+                    }
+                }
+                
+            }
+
+            var to = ""
+            var top = '<span>' + "全部" + '</span><span>'+
+                topic_name.join("</span><span>") +
+                "</span>";
+            to += top
+
+            
+
+            document.getElementById("topic").innerHTML = to
+
+
+            //////////////////////////////valence/////////////////////////////////
+            let valence_name = []
+            var num3 = 0
+            valence_name.push(rows[0][6])
+            for (let i = 0; i < rows.length; i++) {
+                for (let j = 0; j < valence_name.length; j++) {
+                    if (valence_name[j] == rows[i][6]) {
+                        num3++;
+                    }
+                }
+                if (num3 == 0) {
+                    valence_name.push(rows[i][6])
+                }
+                num3 = 0;
+            }
+
+            var va = ""
+            var val = '<span>' + "全部" + "</span><span>" +
+                valence_name.join("</span><span>") +
+                "</span>";
+            va += val
+
+            document.getElementById("valence").innerHTML = va
+
+
+            ///////////////////////////////sorter/////////////////////////////////////
+
+            var so = ""
+            var sor = '<span>' + 'sorters' + '</span>' +
+                '<span>' + columns[2] + '</span>' +
+                '<span>' + columns[4] + '</span>' +
+                '<span>' + columns[5] + '</span>' +
+                '<span>' + columns[6] + '</span>'
+            so += sor
+
+            document.getElementById("sorter").innerHTML = so
+
+        }
+    </script>
+</body>
+
+</html>

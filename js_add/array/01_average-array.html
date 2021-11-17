@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>CalculateAverage</title>
+  </head>
+
+  <body>
+    <h2>平均成績</h2>
+    <p id="score"></p>
+
+    <script>
+      var scores = [
+        [70, 90, 81],
+        [92, 90, 91],
+        [70, 80, 60],
+        [75, 75, 75],
+        [75, 65, 70],
+        [70, 90, 80],
+        [92, 90, 91],
+        [70, 80, 60],
+        [75, 75, 75],
+        [75, 65, 70],
+      ];
+
+      function calcAverage(arr1d) {
+        // assume 1d array
+        var sum = 0;
+
+        for (var i = 0, len = arr1d.length; i < len; i++) {
+          sum += arr1d[i];
+        }
+        // 取小數點下兩位
+        var avg = (sum / len).toFixed(2);
+        return avg;
+      }
+
+      function calcAllAverage(arr2d) {
+        // arr is a 2d array
+        var avgUls = "<ul>";
+        var avgStr = "";
+
+        for (var i = 0, len = arr2d.length; i < len; i++) {
+          var avg = calcAverage(arr2d[i]);
+          var j = i + 1; // we want j to start from 1
+          /* if( j < 10 ){ // pad leading zero if smaller than 10, e.g., 1 --> 01
+            j = "0" + j;
+        } */
+          avgStr = "\n<li>" + "第 " + j + " 位： " + avg + "</li>";
+          avgUls += avgStr;
+        }
+        avgUls += "\n</ul>";
+        return avgUls;
+      }
+
+      document.getElementById("score").innerHTML = calcAllAverage(scores);
+    </script>
+  </body>
+</html>

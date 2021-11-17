@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>計算全班平均成績</title>
+  </head>
+  <body onload="getAverage()">
+    <p id="demo1" style="font-size:2em;"></p>
+
+    <script>
+      //  計算n位同學全班平均成績
+
+      var scoreList = [
+        { id: "s1041234", score: "90" },
+        { id: "s1041238", score: "70" },
+        { id: "s1041239", score: "80" },
+        { id: "s1041256", score: "" }
+      ];
+      
+      // isNaN('') --> false
+      // isNaN('90') -> false
+      // isNaN('A') -> true
+      // 計算串列物件的平均數與有效筆數
+      function calcListAverage(slist) {
+        var sum = 0, count = 0;
+        var result = {};
+
+        for (var i = 0, len = slist.length; i < len; i++) {
+          var s = slist[i].score;
+          if (s && !isNaN(s)) {
+            // s is not null && s is a "number" string
+            console.log(s);
+            sum += parseInt(s); // convert string to integer
+            count++;
+          }
+        }
+        result["average"] = (sum / count).toFixed(2);
+        result["count"] = count;
+        return result;
+      }
+
+      function getAverage() {
+        var result = calcListAverage(scoreList);
+        var outputStr =
+          "The average score of " + result["count"] + " students is: " + result["average"];
+        document.getElementById("demo1").innerHTML = outputStr;
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Calculate Average 2d</title>
+  </head>
+
+  <body onload="showGrades()">
+    <script>
+      var grades = [
+        [89, 77, 78],
+        [76, 82, 81],
+        [91, 94, 89]
+      ];
+
+      function showGrades() {
+        for (var r = 0; r < grades.length; r++) {
+          var total = 0, average = 0;
+
+          //inner loop controlled by grades[row].length
+          for (var c = 0, len = grades[r].length; c < len; c++) {
+            total += grades[r][c];
+          }
+
+          average = total / len;
+
+          document.write(
+            "Student " + (r + 1) + " average: " + average.toFixed(2) + "<br>"
+          );
+        }
+      }
+
+      /*
+    Output:
+      Student 1 average: 81.33
+      Student 2 average: 79.67
+      Student 3 average: 91.33
+    */
+    </script>
+  </body>
+</html>

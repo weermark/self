@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+    <meta charset="utf-8" />
+    <title>:before example</title>
+    <style>
+      html {
+        height: 100%;
+      }
+			div {
+				margin: 1%;
+			}
+			/* block 高度 = width + content 高度 + div 內容高度 */
+      .b1:before {
+        background-color: green;
+        padding-top: 100%; /* relative to width */
+        content: "before 內容";
+        display: block;
+
+        /* width: 10%;
+					height:10px; 	
+					position: absolute; 
+					top: 0px; */
+      }
+			.b2:before {
+        background-color: green;
+        padding-top: 100%; /* relative to width of the contaning block*/
+        content: "";
+        display: block;
+
+        /* width: 10%;
+					height:10px; 	
+					position: absolute; 
+					top: 0px; */
+      }
+      .c {
+        border-top: solid 10px green;
+      }
+    </style>
+  </head>
+  <body onresize="showSize()">
+    <div id="size"></div>
+
+    <div class="b1" style="width: 20%; background: red;"> 
+      new div b1
+    </div>
+		<div class="b2" style="width: 20%; background: red;  position: relative;">
+      new div b2
+		</div>
+		<div class="b2" style="width: 20%; background: red;">
+    </div>
+
+    <br> <!-- div height = 10 (border-top) + 40 (padding-top) + text height -->
+    <div class="c" style="height: 10%; background: red; padding-top: 40px;">
+      text
+    </div>
+
+    <script>
+      function showSize() {
+        var w = window.innerWidth; // outerWidth
+        var h = window.innerHeight; // outerWidth
+        var txt = "Window width and height " + w + ", " + h;
+        document.getElementById("size").innerHTML = txt;
+      }
+
+      // execute when loaded
+      showSize();
+    </script>
+  </body>
+</html>

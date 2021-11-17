@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>onmouseover-Change Color</title>
+  </head>
+  <body>
+    <div
+      onmouseover="mOver(this)"
+      onmouseout="mOut(this)"
+      style="width:200px;height:40px;padding:40px;margin:auto"
+    >
+      Mouse Over Me
+    </div>
+
+    <script>
+      function mOver(element) {
+        element.innerHTML = "Mouse is over me, thank you.";
+        element.style.background = "cyan";
+      }
+
+      function mOut(element) {
+        element.innerHTML = "Please move mouse over me.";
+        element.style.background = "lime";
+      }
+    </script>
+  </body>
+</html>

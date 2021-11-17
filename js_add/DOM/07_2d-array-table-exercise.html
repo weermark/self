@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      #table1,
+      th,
+      td {
+        border: 1px solid black;
+        border-collapse: collapse;
+      }
+      th {
+        padding: 5px;
+      }
+      td {
+        text-align: right;
+        padding-right: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Grades table</h1>
+    <div id="content"></div>
+
+    <script>
+      studentGrades = [
+        { id: "s123456", records: ["80", "80", "80"] },
+        { id: "s124578", records: ["80", "91", "70"] },
+        { id: "s124582", records: ["90", "80", "70"] },
+        { id: "s124588", records: ["70", "89", "80"] },
+        { id: "s125699", records: ["75", "75", "60"] },
+      ];
+
+      tableTitles = ["ID Number", "Science", "Math", "程式設計", "平均成績"];
+
+      displayGrades(studentGrades);
+
+      function displayGrades(table) {
+        var sciSum = 0, matSum = 0, proSum = 0;
+        var html = "<Table id='table1'>\n";
+        html += "<tr>";
+
+        for (var c = 0; c < tableTitles.length; c++) {
+          html += "<TH>" + tableTitles[c] + "</TH>";
+        }
+
+        html += "</tr>";
+
+        for (var i = 0, tlen = table.length; i < tlen; i++) {
+          html += "<TR><TD>" + table[i]["id"] + "</TD>\n";
+          sum = 0;
+          average = 0;
+
+          for (
+            var j = 0, recs = table[i].records, len = recs.length;
+            j < len;
+            j++
+          ) {
+            html += "<TD>" + recs[j] + "</TD>";
+            sum += parseInt(recs[j]);
+          }
+
+          average = (sum / len).toFixed(2); // student average
+
+          html += "<TD>" + average + "</TD>";
+          html += "</TR>\n";
+
+          // sum up course grades
+          sciSum += parseInt(recs[0]);
+          matSum += parseInt(recs[1]);
+          proSum += parseInt(recs[2]);
+        }
+
+        html += "<tr><td></td>";
+
+        // add course average
+        html += "<td>" + (sciSum / tlen).toFixed(2) + "</td>";
+        html += "<td>" + (matSum / tlen).toFixed(2) + "</td>";
+        html += "<td>" + (proSum / tlen).toFixed(2) + "</td>";
+
+        html += "<td></td></tr>\n</table>\n";
+
+        //console.log(html);
+        document.getElementById("content").innerHTML += html;
+      }
+    </script>
+  </body>
+</html>
+
+<!-- avg = courses[i].reduce(function(sum, value) {return sum+value;})/courses[i].length; -->

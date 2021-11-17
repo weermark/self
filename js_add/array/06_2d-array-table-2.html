@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Array 2d to Table</title>
+  </head>
+  <body>
+    <h1>Inventory table</h1>
+    <div id="content"></div>
+
+    <script>
+      // [item Name, Model Number, Quantity]
+      part1 = ["A", "3", "78"];
+      part2 = ["B", "2", "45"];
+      part3 = ["C", "1", "14"];
+
+      // Create a 2d array with a empty first row
+      brakeParts = new Array("", part1, part2, part3);
+
+      displayInventory(brakeParts);
+
+      function displayInventory(table) {
+        var htmlStr = "<Table border=on>\n";
+        htmlStr +=
+          "<tr><TH>Item Number</TH><TH>Item Name</TH><TH>Model Number</TH><TH>Quantity</TH></tr>\n";
+
+        for (var x = 1; x < table.length; x++) {
+          htmlStr += "<TR><TD>" + x + "</TD>"; // 這是列編號
+
+          for (var y = 0; y < table[x].length; y++) {
+            htmlStr += "<TD>" + table[x][y] + "</TD>";
+          }
+
+          htmlStr += "</TR>\n";
+
+          // alternatively, using ar.join()
+          //htmlStr += "<TR><TD>" + x + "</TD><TD>";
+          //htmlStr += table[x].join("</TD><TD>");
+          // console.log(table[x].join("</TD><TD>"));
+          //htmlStr += "</TD></TR>\n";
+        }
+
+        htmlStr += "</table>\n";
+        console.log(htmlStr);
+        document.getElementById("content").innerHTML += htmlStr;
+      }
+      /*
+   <Table border=on> <tr><TH>Item Number</TH><TH>Item Name</TH><TH>Model Number</TH><TH>Quantity</TH></tr> 
+   <TR><TD>1</TD><TD>  A</TD><TD>3</TD><TD>78  </TD></TR> 
+   <TR><TD>2</TD><TD>  B</TD><TD>2</TD><TD>45  </TD></TR> 
+   <TR><TD>3</TD><TD>  C</TD><TD>1</TD><TD>14  </TD></TR> 
+   </table>
+   */
+    </script>
+  </body>
+</html>

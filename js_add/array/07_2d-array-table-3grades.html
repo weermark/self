@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Array 2d Grades to Table</title>
+    <style>
+      td {
+        text-align: right;
+        padding: 1%;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Grades table</h1>
+    <div id="content"></div>
+
+    <script>
+      studentGrades = [
+        ["s123456", "80", "80", "80"],
+        ["s124578", "80", "90", "70"],
+        ["s125699", "75", "75", "60"],
+      ];
+
+      displayGrades(studentGrades);
+
+      function displayGrades(table) {
+        var htmlStr = "<Table border=on>\n";
+        htmlStr +=
+          "<TH>Id Number</TH> <TH>Calculus</TH> <TH>Science</TH> <TH>Programming</TH> <TH>Average</TH>\n";
+
+        for (var x = 0; x < table.length; x++) {
+          htmlStr += "<TR><TD>" + table[x][0] + "</TD>\n";
+          var sum = 0, avg = 0;
+
+          for (var y = 1, len = table[x].length; y < len; y++) {
+            htmlStr += "<TD>" + table[x][y] + "</TD>";
+            sum += parseInt(table[x][y]);
+          }
+          average = (sum / (len - 1)).toFixed(2);
+
+          htmlStr += "<TD>" + avg + "</TD>";
+          htmlStr += "</TR>\n";
+        }
+        htmlStr += "</table>\n";
+        //console.log(htmlStr);
+        document.getElementById("content").innerHTML += htmlStr;
+      }
+    </script>
+  </body>
+</html>
