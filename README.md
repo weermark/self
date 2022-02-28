@@ -1,5 +1,5 @@
 # self
-use to store some code.
+This repository will be my resume when my coding ability level up.
 
 ## index.html
-try to build a rwd webview. you can watch it at https://weermark.github.io/self/
+https://weermark.github.io/self/ (this is empty now. I will bulid it when I have time.)
